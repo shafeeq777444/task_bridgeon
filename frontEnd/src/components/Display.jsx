@@ -1,10 +1,15 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setExpense, settotalExpense } from "../features/slices/expenseSlice";
 
 const Display = () => {
-    const [state, setState] = useState([]);
+    const dispatch=useDispatch()
+    // const [state, setState] = useState([]);
     const [category, setCategory] = useState("All");
-    const [totalExpense, settotalExpense] = useState();
+   const data= useSelector(state=>state.expense.expense)
+   const totalExpense= useSelector(state=>state.expense.totalExpense)
+   console.log(data)
 
     useEffect(() => {
         let fetchData = [];
@@ -16,8 +21,11 @@ const Display = () => {
                 fetchData = fetchData.filter((x) => x.category == category);
             }
           const amount= fetchData.reduce((acc,x)=>acc=acc+x.amount,0)
-        settotalExpense(amount)
-            setState(fetchData);
+          dispatch(settotalExpense(amount))
+
+          dispatch(setExpense(fetchData))
+        // settotalExpense(amount)
+            // setState(fetchData);
         };
 
         fetch();
@@ -31,6 +39,7 @@ const Display = () => {
     // },[category])
     return (
         <>
+         <p className="bg-amber-200 text-amber-900 font-semibold text-lg p-3 rounded mb-4 w-max">TotalAmount:{totalExpense}</p>
             <select
                 value={category}
                 onChange={(e) => {
@@ -43,16 +52,21 @@ const Display = () => {
                 <option>other</option>
             </select>
             <div>
-                {state.map((x, ind) => (
-                    <div className="display" key={ind}>
-                        <p>{x.amount}</p>
-                        <p>{x.category}</p>
-                        <p>{x.description}</p>
+                 <div className="flex justify-evenly py-3 bg-blue-600 text-white font-bold rounded-t">
+                     <p>Amount</p>
+                            <p>Category</p>
+                            <p>Description</p>
+                 </div>
+                {data?.map((x, ind) => (
+                    <div className=" flex gap-10 y py-3  hover:bg-blue-100 justify-evenly  text-center bg-gray-50" key={ind}>
+                        <p className=" text-left">{x.amount}</p>
+                        <p className=" text-justify">{x.category}</p>
+                        <p className=" text-justify">{x.description}</p>
                     </div>
                 ))}
-                {console.log(state)}
+                {/* {console.log(state)} */}
             </div>
-            <p>TotalAmount:{totalExpense}</p>
+           
         </>
     );
 };
